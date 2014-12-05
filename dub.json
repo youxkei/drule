@@ -1,0 +1,9 @@
+{
+	"name": "drule",
+	"description": "A minimal D application.",
+	"copyright": "Copyright © 2014, youkei",
+	"authors": ["youkei"],
+	"dependencies": {
+        "ctpg": "2.2.3"
+	}
+}
