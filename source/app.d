@@ -44,10 +44,10 @@ struct Rule
 
         if (rhss.length > 1)
         {
-            result ~= "\n)\n";
+            result ~= "\n)";
         }
 
-        result ~= ")(src);\n}\n\n";
+        result ~= "\n)(src);\n}\n\n";
 
         return result;
     }
