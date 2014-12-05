@@ -3,17 +3,86 @@ import ctpg;
  struct Grammar
 {
     Rule[] rules;
+
+    string toString()
+    {
+        string result;
+
+        foreach (rule; rules)
+        {
+            result ~= rule.toString();
+        }
+
+        return result;
+    }
 }
 
 struct Rule
 {
     string lhs;
     Rhs[] rhss;
+
+    string toString()
+    {
+        import std.string;
+
+        string result = "Result %s(alias ruleSelector)(string src)\n{\nreturn setRuleName!(\"%s\",\n".format(lhs, lhs);
+
+        if (rhss.length > 1)
+        {
+            result ~= "choice!(\n";
+        }
+
+        foreach (i, rhs; rhss)
+        {
+            if (i)
+            {
+                result ~= ",\n";
+            }
+            result ~= rhs.toString();
+        }
+
+        if (rhss.length > 1)
+        {
+            result ~= "\n)\n";
+        }
+
+        result ~= ")(src);\n}\n\n";
+
+        return result;
+    }
 }
 
 struct Rhs
 {
     Term[] terms;
+
+    string toString()
+    {
+        string result;
+
+        if (terms.length > 1)
+        {
+            result ~= "sequence!(\n";
+        }
+
+        foreach (i, term; terms)
+        {
+            if (i)
+            {
+                result ~= ",\n";
+            }
+
+            result ~= term.toString();
+        }
+
+        if (terms.length > 1)
+        {
+            result ~= "\n)";
+        }
+
+        return result;
+    }
 }
 
 struct Term
@@ -21,6 +90,34 @@ struct Term
     string value;
     bool isTerminal;
     bool isOptional;
+
+    string toString()
+    {
+        import std.string;
+
+        string result;
+
+        if (isOptional)
+        {
+            result ~= "option!(";
+        }
+
+        if (isTerminal)
+        {
+            result ~= `toToken!"%s"`.format(value);
+        }
+        else
+        {
+            result ~= `ruleSelector!"%s"`.format(value);
+        }
+
+        if (isOptional)
+        {
+            result ~= ")";
+        }
+
+        return result;
+    }
 }
 
 alias any = parseAnyChar;
@@ -60,12 +157,11 @@ q{
 
 void main()
 {
-    import std.stdio : writeln;
+    import std.stdio;
     import std.file;
-    import std.algorithm : count, filter;
 
-    string src = readText("/home/youkei/repo/dlang.org/grammar.dd");
-    auto parsed = src.parse!grammars();
-    parsed.value.writeln();
-    parsed.match.writeln();
+    foreach (grammar; readText("grammar.dd").parse!grammars().value)
+    {
+        grammar.toString().writeln();
+    }
 }
