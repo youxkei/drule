@@ -1,4 +1,9 @@
 import ctpg;
+import std.algorithm : map, joiner;
+import std.array : array;
+import std.conv : to;
+
+version = OutputPeg;
 
  struct Grammar
 {
@@ -6,14 +11,7 @@ import ctpg;
 
     string toString()
     {
-        string result;
-
-        foreach (rule; rules)
-        {
-            result ~= rule.toString();
-        }
-
-        return result;
+        return rules.map!(rule => rule.toString())().joiner("\n").array().to!string();
     }
 }
 
@@ -22,34 +20,44 @@ struct Rule
     string lhs;
     Rhs[] rhss;
 
-    string toString()
+    version(OutputPeg)
     {
-        import std.string;
-
-        string result = "Result %s(alias ruleSelector)(string src)\n{\nreturn setRuleName!(\"%s\",\n".format(lhs, lhs);
-
-        if (rhss.length > 1)
+        string toString()
         {
-            result ~= "choice!(\n";
+            return lhs ~ " <- " ~ rhss.map!(rhs => rhs.toString())().joiner(" / ").array().to!string();
         }
-
-        foreach (i, rhs; rhss)
+    }
+    else
+    {
+        string toString()
         {
-            if (i)
+            import std.string;
+
+            string result = "Result %s(alias ruleSelector)(string src)\n{\nreturn setRuleName!(\"%s\",\n".format(lhs, lhs);
+
+            if (rhss.length > 1)
             {
-                result ~= ",\n";
+                result ~= "choice!(\n";
             }
-            result ~= rhs.toString();
+
+            foreach (i, rhs; rhss)
+            {
+                if (i)
+                {
+                    result ~= ",\n";
+                }
+                result ~= rhs.toString();
+            }
+
+            if (rhss.length > 1)
+            {
+                result ~= "\n)";
+            }
+
+            result ~= "\n)(src);\n}\n\n";
+
+            return result;
         }
-
-        if (rhss.length > 1)
-        {
-            result ~= "\n)";
-        }
-
-        result ~= "\n)(src);\n}\n\n";
-
-        return result;
     }
 }
 
@@ -57,31 +65,41 @@ struct Rhs
 {
     Term[] terms;
 
-    string toString()
+    version(OutputPeg)
     {
-        string result;
-
-        if (terms.length > 1)
+        string toString()
         {
-            result ~= "sequence!(\n";
+            return terms.map!(term => term.toString())().joiner(" ").array().to!string();
         }
-
-        foreach (i, term; terms)
+    }
+    else
+    {
+        string toString()
         {
-            if (i)
+            string result;
+
+            if (terms.length > 1)
             {
-                result ~= ",\n";
+                result ~= "sequence!(\n";
             }
 
-            result ~= term.toString();
-        }
+            foreach (i, term; terms)
+            {
+                if (i)
+                {
+                    result ~= ",\n";
+                }
 
-        if (terms.length > 1)
-        {
-            result ~= "\n)";
-        }
+                result ~= term.toString();
+            }
 
-        return result;
+            if (terms.length > 1)
+            {
+                result ~= "\n)";
+            }
+
+            return result;
+        }
     }
 }
 
@@ -91,32 +109,61 @@ struct Term
     bool isTerminal;
     bool isOptional;
 
-    string toString()
+    version(OutputPeg)
     {
-        import std.string;
-
-        string result;
-
-        if (isOptional)
+        string toString()
         {
-            result ~= "option!(";
-        }
+            string result;
 
-        if (isTerminal)
-        {
-            result ~= `toToken!"%s"`.format(value);
-        }
-        else
-        {
-            result ~= `ruleSelector!"%s"`.format(value);
-        }
+            if (isTerminal)
+            {
+                result ~= '"';
+            }
 
-        if (isOptional)
-        {
-            result ~= ")";
-        }
+            result ~= value;
 
-        return result;
+            if (isTerminal)
+            {
+                result ~= '"';
+            }
+
+            if (isOptional)
+            {
+                result ~= '?';
+            }
+
+            return result;
+        }
+    }
+    else
+    {
+        string toString()
+        {
+            import std.string;
+
+            string result;
+
+            if (isOptional)
+            {
+                result ~= "option!(";
+            }
+
+            if (isTerminal)
+            {
+                result ~= `toToken!"%s"`.format(value);
+            }
+            else
+            {
+                result ~= `ruleSelector!"%s"`.format(value);
+            }
+
+            if (isOptional)
+            {
+                result ~= ")";
+            }
+
+            return result;
+        }
     }
 }
 
