@@ -1,0 +1,271 @@
+Type <- TypeCtors? BasicType AltDeclarator?
+TypeCtors <- TypeCtor+
+TypeCtor <- "const" / "immutable" / "inout" / "shared"
+BasicType <- BasicTypeX / "."? IdentifierList / Typeof ("." IdentifierList)? / TypeCtor "(" Type ")"
+BasicTypeX <- "bool" / "byte" / "ubyte" / "short" / "ushort" / "int" / "uint" / "long" / "ulong" / "char" / "wchar" / "dchar" / "float" / "double" / "real" / "ifloat" / "idouble" / "ireal" / "cfloat" / "cdouble" / "creal" / "void"
+BasicType2 <- "*" / "[" "]" / "[" AssignExpression "]" / "[" AssignExpression ".." AssignExpression "]" / "[" Type "]" / "delegate" Parameters MemberFunctionAttributes? / "function" Parameters FunctionAttributes?
+IdentifierList <- Identifier ("." IdentifierList)? / TemplateInstance ("." IdentifierList)?
+Typeof <- "typeof" "(" Expression ")" / "typeof" "(" "return" ")"
+Expression <- CommaExpression
+CommaExpression <- AssignExpression ("," CommaExpression)
+AssignExpression <- ConditionalExpression / ConditionalExpression "=" AssignExpression / ConditionalExpression "+=" AssignExpression / ConditionalExpression "-=" AssignExpression / ConditionalExpression "*=" AssignExpression / ConditionalExpression "/=" AssignExpression / ConditionalExpression "%=" AssignExpression / ConditionalExpression "&=" AssignExpression / ConditionalExpression "|=" AssignExpression / ConditionalExpression "^=" AssignExpression / ConditionalExpression "~=" AssignExpression / ConditionalExpression "<" "<" "=" AssignExpression / ConditionalExpression ">>=" AssignExpression / ConditionalExpression ">>>=" AssignExpression / ConditionalExpression "^^=" AssignExpression
+ConditionalExpression <- OrOrExpression / OrOrExpression "?" Expression ":" ConditionalExpression
+OrOrExpression <- AndAndExpression / OrOrExpression "||" AndAndExpression
+AndAndExpression <- OrExpression / AndAndExpression "&&" OrExpression / CmpExpression / AndAndExpression "&&" CmpExpression
+OrExpression <- XorExpression / OrExpression "|" XorExpression
+XorExpression <- AndExpression / XorExpression "^" AndExpression
+AndExpression <- ShiftExpression / AndExpression "&" ShiftExpression
+CmpExpression <- ShiftExpression / EqualExpression / IdentityExpression / RelExpression / InExpression
+EqualExpression <- ShiftExpression "==" ShiftExpression / ShiftExpression "!=" ShiftExpression
+IdentityExpression <- ShiftExpression "is" ShiftExpression / ShiftExpression "!is" ShiftExpression
+RelExpression <- ShiftExpression "<" ShiftExpression / ShiftExpression "<" "=" ShiftExpression / ShiftExpression ">" ShiftExpression / ShiftExpression ">=" ShiftExpression / ShiftExpression "!<>=" ShiftExpression / ShiftExpression "!<>" ShiftExpression / ShiftExpression "<>" ShiftExpression / ShiftExpression "<>=" ShiftExpression / ShiftExpression "!>" ShiftExpression / ShiftExpression "!>=" ShiftExpression / ShiftExpression "!<" ShiftExpression / ShiftExpression "!<=" ShiftExpression
+InExpression <- ShiftExpression "in" ShiftExpression / ShiftExpression "!in" ShiftExpression
+ShiftExpression <- AddExpression / ShiftExpression "<" "<" AddExpression / ShiftExpression ">" ">" AddExpression / ShiftExpression ">" ">" ">" AddExpression
+AddExpression <- MulExpression / AddExpression "+" MulExpression / AddExpression "-" MulExpression / CatExpression
+CatExpression <- AddExpression "~" MulExpression
+MulExpression <- UnaryExpression / MulExpression "*" UnaryExpression / MulExpression "/" UnaryExpression / MulExpression "%" UnaryExpression
+UnaryExpression <- "&" UnaryExpression / "++" UnaryExpression / "--" UnaryExpression / "*" UnaryExpression / "-" UnaryExpression / "+" UnaryExpression / "!" UnaryExpression / ComplementExpression / "(" Type ")" "." Identifier / "(" Type ")" "." TemplateInstance / DeleteExpression / CastExpression / PowExpression
+ComplementExpression <- "~" UnaryExpression
+NewExpression <- "new" AllocatorArguments? Type / NewExpressionWithArgs
+NewExpressionWithArgs <- "new" AllocatorArguments? Type "[" AssignExpression "]" / "new" AllocatorArguments? Type "(" ArgumentList? ")" / NewAnonClassExpression
+AllocatorArguments <- "(" ArgumentList? ")"
+ArgumentList <- AssignExpression / AssignExpression "," / AssignExpression "," ArgumentList
+NewAnonClassExpression <- "new" AllocatorArguments? "class" ClassArguments? SuperClass? Interfaces? AggregateBody
+ClassArguments <- "(" ArgumentList? ")"
+DeleteExpression <- "delete" UnaryExpression
+CastExpression <- "cast" "(" Type ")" UnaryExpression / "cast" "(" TypeCtors? ")" UnaryExpression
+PowExpression <- PostfixExpression / PostfixExpression "^^" UnaryExpression
+PostfixExpression <- PrimaryExpression / PostfixExpression "." Identifier / PostfixExpression "." TemplateInstance / PostfixExpression "." NewExpression / PostfixExpression "++" / PostfixExpression "--" / PostfixExpression "(" ArgumentList? ")" / TypeCtors? BasicType "(" ArgumentList? ")" / IndexExpression / SliceExpression
+IndexExpression <- PostfixExpression "[" ArgumentList "]"
+SliceExpression <- PostfixExpression "[ ]" / PostfixExpression "[" AssignExpression ".." AssignExpression "]"
+PrimaryExpression <- Identifier / "." Identifier / TemplateInstance / "." TemplateInstance / "this" / "super" / "null" / "true" / "false" / "$" / IntegerLiteral / FloatLiteral / CharacterLiteral / StringLiterals / ArrayLiteral / AssocArrayLiteral / FunctionLiteral / AssertExpression / MixinExpression / ImportExpression / NewExpressionWithArgs / BasicTypeX "." Identifier / Typeof / TypeidExpression / IsExpression / "(" Expression ")" / TraitsExpression / SpecialKeyword
+StringLiterals <- StringLiteral / StringLiterals StringLiteral
+ArrayLiteral <- "[" ArgumentList? "]"
+AssocArrayLiteral <- "[" KeyValuePairs "]"
+KeyValuePairs <- KeyValuePair / KeyValuePair "," KeyValuePairs
+KeyValuePair <- KeyExpression ":" ValueExpression
+KeyExpression <- AssignExpression
+ValueExpression <- AssignExpression
+FunctionLiteral <- "function" Type? ParameterAttributes? FunctionLiteralBody / "delegate" Type? ParameterAttributes? FunctionLiteralBody / ParameterAttributes FunctionLiteralBody / FunctionLiteralBody / Lambda
+ParameterAttributes <- Parameters / Parameters FunctionAttributes
+FunctionLiteralBody <- BlockStatement / FunctionContracts? BodyStatement
+Lambda <- "function" Type? ParameterAttributes "=>" AssignExpression / "delegate" Type? ParameterAttributes "=>" AssignExpression / ParameterAttributes "=>" AssignExpression / Identifier "=>" AssignExpression
+AssertExpression <- "assert" "(" AssignExpression ")" / "assert" "(" AssignExpression "," AssignExpression ")"
+MixinExpression <- "mixin" "(" AssignExpression ")"
+ImportExpression <- "import" "(" AssignExpression ")"
+TypeidExpression <- "typeid" "(" Type ")" / "typeid" "(" Expression ")"
+IsExpression <- "is" "(" Type ")" / "is" "(" Type ":" TypeSpecialization ")" / "is" "(" Type "==" TypeSpecialization ")" / "is" "(" Type ":" TypeSpecialization "," TemplateParameterList ")" / "is" "(" Type "==" TypeSpecialization "," TemplateParameterList ")" / "is" "(" Type Identifier ")" / "is" "(" Type Identifier ":" TypeSpecialization ")" / "is" "(" Type Identifier "==" TypeSpecialization ")" / "is" "(" Type Identifier ":" TypeSpecialization "," TemplateParameterList ")" / "is" "(" Type Identifier "==" TypeSpecialization "," TemplateParameterList ")"
+TypeSpecialization <- Type / "struct" / "union" / "class" / "interface" / "enum" / "function" / "delegate" / "super" / "const" / "immutable" / "inout" / "shared" / "return" / "__parameters"
+TraitsExpression <- "__traits" "(" TraitsKeyword "," TraitsArguments ")"
+TraitsKeyword <- "isAbstractClass" / "isArithmetic" / "isAssociativeArray" / "isFinalClass" / "isPOD" / "isNested" / "isFloating" / "isIntegral" / "isScalar" / "isStaticArray" / "isUnsigned" / "isVirtualFunction" / "isVirtualMethod" / "isAbstractFunction" / "isFinalFunction" / "isStaticFunction" / "isOverrideFunction" / "isRef" / "isOut" / "isLazy" / "hasMember" / "identifier" / "getAliasThis" / "getAttributes" / "getMember" / "getOverloads" / "getProtection" / "getVirtualFunctions" / "getVirtualMethods" / "getUnitTests" / "parent" / "classInstanceSize" / "getVirtualIndex" / "allMembers" / "derivedMembers" / "isSame" / "compiles"
+TraitsArguments <- TraitsArgument / TraitsArgument "," TraitsArguments
+TraitsArgument <- AssignExpression / Type
+SpecialKeyword <- "__FILE__" / "__MODULE__" / "__LINE__" / "__FUNCTION__" / "__PRETTY_FUNCTION__"
+Statement <- ";" / NonEmptyStatement / ScopeBlockStatement
+NoScopeNonEmptyStatement <- NonEmptyStatement / BlockStatement
+NoScopeStatement <- ";" / NonEmptyStatement / BlockStatement
+NonEmptyOrScopeBlockStatement <- NonEmptyStatement / ScopeBlockStatement
+NonEmptyStatement <- NonEmptyStatementNoCaseNoDefault / CaseStatement / CaseRangeStatement / DefaultStatement
+NonEmptyStatementNoCaseNoDefault <- LabeledStatement / ExpressionStatement / DeclarationStatement / IfStatement / WhileStatement / DoStatement / ForStatement / ForeachStatement / SwitchStatement / FinalSwitchStatement / ContinueStatement / BreakStatement / ReturnStatement / GotoStatement / WithStatement / SynchronizedStatement / TryStatement / ScopeGuardStatement / ThrowStatement / AsmStatement / PragmaStatement / MixinStatement / ForeachRangeStatement / ConditionalStatement / StaticAssert / TemplateMixin / ImportDeclaration
+ScopeStatement <- NonEmptyStatement / BlockStatement
+ScopeBlockStatement <- BlockStatement
+LabeledStatement <- Identifier ":" / Identifier ":" NoScopeStatement / Identifier ":" Statement
+BlockStatement <- "{ }" / "{" StatementList "}"
+StatementList <- Statement / Statement StatementList
+ExpressionStatement <- Expression ";"
+DeclarationStatement <- Declaration
+IfStatement <- "if" "(" IfCondition ")" ThenStatement / "if" "(" IfCondition ")" ThenStatement "else" ElseStatement
+IfCondition <- Expression / "auto" Identifier "=" Expression / TypeCtors Identifier "=" Expression / TypeCtors? BasicType Declarator "=" Expression
+ThenStatement <- ScopeStatement
+ElseStatement <- ScopeStatement
+WhileStatement <- "while" "(" Expression ")" ScopeStatement
+DoStatement <- "do" ScopeStatement "while" "(" Expression ")" ";"
+ForStatement <- "for" "(" Initialize Test? ";" Increment? ")" ScopeStatement
+Initialize <- ";" / NoScopeNonEmptyStatement
+Test <- Expression
+Increment <- Expression
+ForeachStatement <- Foreach "(" ForeachTypeList ";" ForeachAggregate ")" NoScopeNonEmptyStatement
+Foreach <- "foreach" / "foreach_reverse"
+ForeachTypeList <- ForeachType / ForeachType "," ForeachTypeList
+ForeachType <- "ref"? TypeCtors? BasicType Declarator / "ref"? TypeCtors? Identifier
+ForeachAggregate <- Expression
+ForeachRangeStatement <- Foreach "(" ForeachType ";" LwrExpression ".." UprExpression ")" ScopeStatement
+LwrExpression <- Expression
+UprExpression <- Expression
+SwitchStatement <- "switch" "(" Expression ")" ScopeStatement
+CaseStatement <- "case" ArgumentList ":" ScopeStatementList
+CaseRangeStatement <- "case" FirstExp ": .. case" LastExp ":" ScopeStatementList
+FirstExp <- AssignExpression
+LastExp <- AssignExpression
+DefaultStatement <- "default" ":" ScopeStatementList
+ScopeStatementList <- StatementListNoCaseNoDefault
+StatementListNoCaseNoDefault <- StatementNoCaseNoDefault / StatementNoCaseNoDefault StatementListNoCaseNoDefault
+StatementNoCaseNoDefault <- ";" / NonEmptyStatementNoCaseNoDefault / ScopeBlockStatement
+FinalSwitchStatement <- "final" "switch" "(" Expression ")" ScopeStatement
+ContinueStatement <- "continue" Identifier? ";"
+BreakStatement <- "break" Identifier? ";"
+ReturnStatement <- "return" Expression? ";"
+GotoStatement <- "goto" Identifier ";" / "goto" "default" ";" / "goto" "case" ";" / "goto" "case" Expression ";"
+WithStatement <- "with" "(" Expression ")" ScopeStatement / "with" "(" Symbol ")" ScopeStatement / "with" "(" TemplateInstance ")" ScopeStatement
+SynchronizedStatement <- "synchronized" ScopeStatement / "synchronized" "(" Expression ")" ScopeStatement
+TryStatement <- "try" ScopeStatement Catches / "try" ScopeStatement Catches FinallyStatement / "try" ScopeStatement FinallyStatement
+Catches <- LastCatch / Catch / Catch Catches
+LastCatch <- "catch" NoScopeNonEmptyStatement
+Catch <- "catch" "(" CatchParameter ")" NoScopeNonEmptyStatement
+CatchParameter <- BasicType Identifier
+FinallyStatement <- "finally" NoScopeNonEmptyStatement
+ThrowStatement <- "throw" Expression ";"
+ScopeGuardStatement <- "scope" "(" "exit" ")" NonEmptyOrScopeBlockStatement / "scope" "(" "success" ")" NonEmptyOrScopeBlockStatement / "scope" "(" "failune" ")" NonEmptyOrScopeBlockStatement
+PragmaStatement <- Pragma NoScopeStatement
+MixinStatement <- "mixin" "(" AssignExpression ")" ";"
+Declaration <- FuncDeclaration / VarDeclarations / AliasDeclaration / AggregateDeclaration / EnumDeclaration / ImportDeclaration
+AliasDeclaration <- "alias" StorageClasses? BasicType Declarator ";" / "alias" StorageClasses? BasicType FuncDeclarator ";" / "alias" AliasDeclarationX ";"
+AliasDeclarationX <- Identifier TemplateParameters? "=" StorageClasses? Type / AliasDeclarationX "," Identifier TemplateParameters? "=" StorageClasses? Type
+AutoDeclaration <- StorageClasses AutoDeclarationX ";"
+AutoDeclarationX <- Identifier TemplateParameters? "=" Initializer / AutoDeclarationX "," Identifier TemplateParameters? "=" Initializer
+VarDeclarations <- StorageClasses? BasicType Declarators ";" / AutoDeclaration
+Declarators <- DeclaratorInitializer / DeclaratorInitializer "," DeclaratorIdentifierList
+DeclaratorInitializer <- VarDeclarator / VarDeclarator TemplateParameters? "=" Initializer / AltDeclarator / AltDeclarator "=" Initializer
+DeclaratorIdentifierList <- DeclaratorIdentifier / DeclaratorIdentifier "," DeclaratorIdentifierList
+DeclaratorIdentifier <- VarDeclaratorIdentifier / AltDeclaratorIdentifier
+VarDeclaratorIdentifier <- Identifier / Identifier TemplateParameters? "=" Initializer
+AltDeclaratorIdentifier <- BasicType2 Identifier AltDeclaratorSuffixes? / BasicType2 Identifier AltDeclaratorSuffixes? "=" Initializer / BasicType2? Identifier AltDeclaratorSuffixes / BasicType2? Identifier AltDeclaratorSuffixes "=" Initializer
+Declarator <- VarDeclarator / AltDeclarator
+VarDeclarator <- BasicType2? Identifier
+AltDeclarator <- BasicType2? Identifier AltDeclaratorSuffixes / BasicType2? "(" AltDeclaratorX ")" / BasicType2? "(" AltDeclaratorX ")" AltFuncDeclaratorSuffix / BasicType2? "(" AltDeclaratorX ")" AltDeclaratorSuffixes
+AltDeclaratorX <- BasicType2? Identifier / BasicType2? Identifier AltFuncDeclaratorSuffix / AltDeclarator
+AltDeclaratorSuffixes <- AltDeclaratorSuffix / AltDeclaratorSuffix AltDeclaratorSuffixes
+AltDeclaratorSuffix <- "[" "]" / "[" AssignExpression "]" / "[" Type "]"
+AltFuncDeclaratorSuffix <- Parameters MemberFunctionAttributes?
+StorageClasses <- StorageClass / StorageClass StorageClasses
+StorageClass <- LinkageAttribute / AlignAttribute / "deprecated" / "enum" / "static" / "extern" / "abstract" / "final" / "override" / "synchronized" / "auto" / "scope" / "const" / "immutable" / "inout" / "shared" / "__gshared" / Property / "nothrow" / "pure" / "ref"
+Initializer <- VoidInitializer / NonVoidInitializer
+VoidInitializer <- "void"
+NonVoidInitializer <- ExpInitializer / ArrayInitializer / StructInitializer
+ExpInitializer <- AssignExpression
+ArrayInitializer <- "[" ArrayMemberInitializations? "]"
+ArrayMemberInitializations <- ArrayMemberInitialization / ArrayMemberInitialization "," / ArrayMemberInitialization "," ArrayMemberInitializations
+ArrayMemberInitialization <- NonVoidInitializer / AssignExpression ":" NonVoidInitializer
+StructInitializer <- "{" StructMemberInitializers? "}"
+StructMemberInitializers <- StructMemberInitializer / StructMemberInitializer "," / StructMemberInitializer "," StructMemberInitializers
+StructMemberInitializer <- NonVoidInitializer / Identifier ":" NonVoidInitializer
+FuncDeclaration <- StorageClasses? BasicType FuncDeclarator FunctionBody / AutoFuncDeclaration
+AutoFuncDeclaration <- StorageClasses Identifier FuncDeclaratorSuffix FunctionBody
+FuncDeclarator <- BasicType2? Identifier FuncDeclaratorSuffix
+FuncDeclaratorSuffix <- Parameters MemberFunctionAttributes? / TemplateParameters Parameters MemberFunctionAttributes? Constraint?
+Parameters <- "(" ParameterList? ")"
+ParameterList <- Parameter / Parameter "," ParameterList / "..."
+Parameter <- InOut? BasicType Declarator / InOut? BasicType Declarator "..." / InOut? BasicType Declarator "=" AssignExpression / InOut? Type / InOut? Type "..."
+InOut <- InOutX / InOutInOutX
+InOutX <- "auto" / TypeCtor / "final" / "in" / "lazy" / "out" / "ref" / "scope"
+FunctionAttributes <- FunctionAttribute / FunctionAttribute FunctionAttributes
+FunctionAttribute <- "nothrow" / "pure" / Property
+MemberFunctionAttributes <- MemberFunctionAttribute / MemberFunctionAttribute MemberFunctionAttributes
+MemberFunctionAttribute <- "const" / "immutable" / "inout" / "shared" / FunctionAttribute
+FunctionBody <- BlockStatement / FunctionContracts? BodyStatement / FunctionContracts
+FunctionContracts <- InStatement OutStatement? / OutStatement InStatement?
+InStatement <- "in" BlockStatement
+OutStatement <- "out" BlockStatement / "out" "(" Identifier ")" BlockStatement
+BodyStatement <- "body" BlockStatement
+Constructor <- "this" Parameters MemberFunctionAttributes? ";" / "this" Parameters MemberFunctionAttributes? FunctionBody / ConstructorTemplate
+ConstructorTemplate <- "this" TemplateParameters Parameters MemberFunctionAttributes? Constraint? ";" / "this" TemplateParameters Parameters MemberFunctionAttributes? Constraint? FunctionBody
+Destructor <- "~" "this" "(" ")" MemberFunctionAttributes? ";" / "~" "this" "(" ")" MemberFunctionAttributes? FunctionBody
+Postblit <- "this" "(" "this" ")" MemberFunctionAttributes? ";" / "this" "(" "this" ")" MemberFunctionAttributes? FunctionBody
+Allocator <- "new" Parameters ";" / "new" Parameters FunctionBody
+Deallocator <- "delete" Parameters ";" / "delete" Parameters FunctionBody
+Invariant <- "invariant" "(" ")" BlockStatement
+UnitTest <- "unittest" BlockStatement
+StaticConstructor <- "static" "this" "(" ")" ";" / "static" "this" "(" ")" FunctionBody
+StaticDestructor <- "static" "~" "this" "(" ")" MemberFunctionAttributes? ";" / "static" "~" "this" "(" ")" MemberFunctionAttributes? FunctionBody
+SharedStaticConstructor <- "shared" "static" "this" "(" ")" ";" / "shared" "static" "this" "(" ")" FunctionBody
+SharedStaticDestructor <- "shared" "static" "~" "this" "(" ")" MemberFunctionAttributes? ";" / "shared" "static" "~" "this" "(" ")" MemberFunctionAttributes? FunctionBody
+AggregateDeclaration <- ClassDeclaration / InterfaceDeclaration / StructDeclaration / UnionDeclaration
+ClassDeclaration <- "class" Identifier ";" / "class" Identifier BaseClassList? AggregateBody / ClassTemplateDeclaration
+ClassTemplateDeclaration <- "class" Identifier TemplateParameters Constraint? BaseClassList? AggregateBody / "class" Identifier TemplateParameters BaseClassList Constraint AggregateBody
+InterfaceDeclaration <- "interface" Identifier ";" / "interface" Identifier BaseInterfaceList? AggregateBody / InterfaceTemplateDeclaration
+InterfaceTemplateDeclaration <- "interface" Identifier TemplateParameters Constraint? BaseInterfaceList? AggregateBody / "interface" Identifier TemplateParameters BaseInterfaceList Constraint AggregateBody
+StructDeclaration <- "struct" Identifier ";" / "struct" Identifier AggregateBody / StructTemplateDeclaration / AnonStructDeclaration
+StructTemplateDeclaration <- "struct" Identifier TemplateParameters Constraint? AggregateBody
+AnonStructDeclaration <- "struct" AggregateBody
+UnionDeclaration <- "union" Identifier ";" / "union" Identifier AggregateBody / UnionTemplateDeclaration / AnonUnionDeclaration
+UnionTemplateDeclaration <- "union" Identifier TemplateParameters Constraint? AggregateBody
+AnonUnionDeclaration <- "union" AggregateBody
+AggregateBody <- "{" DeclDefs? "}"
+BaseClassList <- ":" SuperClass / ":" SuperClass "," Interfaces / ":" Interfaces
+BaseInterfaceList <- ":" Interfaces
+SuperClass <- BasicType
+Interfaces <- Interface / Interface "," Interfaces
+Interface <- BasicType
+AliasThis <- "alias" Identifier "this ;"
+EnumDeclaration <- "enum" EnumTag EnumBody / "enum" EnumBody / "enum" EnumTag ":" EnumBaseType EnumBody / "enum" ":" EnumBaseType EnumBody
+EnumTag <- Identifier
+EnumBaseType <- Type
+EnumBody <- EmptyEnumBody / EnumMembersBody
+EmptyEnumBody <- ";"
+EnumMembersBody <- "{" EnumMembers "}"
+EnumMembers <- EnumMember / EnumMember "," / EnumMember "," EnumMembers
+EnumMember <- Identifier / Identifier "=" AssignExpression / Type Identifier "=" AssignExpression
+TemplateDeclaration <- "template" Identifier TemplateParameters Constraint? "{" DeclDefs? "}"
+TemplateParameters <- "(" TemplateParameterList? ")"
+TemplateParameterList <- TemplateParameter / TemplateParameter "," / TemplateParameter "," TemplateParameterList
+TemplateParameter <- TemplateTypeParameter / TemplateValueParameter / TemplateAliasParameter / TemplateTupleParameter / TemplateThisParameter
+Constraint <- "if" "(" Expression ")"
+TemplateInstance <- Identifier TemplateArguments
+TemplateArguments <- "!" "(" TemplateArgumentList? ")" / "!" TemplateSingleArgument
+TemplateArgumentList <- TemplateArgument / TemplateArgument "," / TemplateArgument "," TemplateArgumentList
+TemplateArgument <- Type / AssignExpression / Symbol
+Symbol <- SymbolTail / "." SymbolTail
+SymbolTail <- Identifier / Identifier "." SymbolTail / TemplateInstance / TemplateInstance "." SymbolTail
+TemplateSingleArgument <- Identifier / BasicTypeX / CharacterLiteral / StringLiteral / IntegerLiteral / FloatLiteral / "true" / "false" / "null" / "this" / SpecialKeyword
+TemplateTypeParameter <- Identifier / Identifier TemplateTypeParameterSpecialization / Identifier TemplateTypeParameterDefault / Identifier TemplateTypeParameterSpecialization TemplateTypeParameterDefault
+TemplateTypeParameterSpecialization <- ":" Type
+TemplateTypeParameterDefault <- "=" Type
+TemplateThisParameter <- "this" TemplateTypeParameter
+TemplateValueParameter <- BasicType Declarator / BasicType Declarator TemplateValueParameterSpecialization / BasicType Declarator TemplateValueParameterDefault / BasicType Declarator TemplateValueParameterSpecialization TemplateValueParameterDefault
+TemplateValueParameterSpecialization <- ":" ConditionalExpression
+TemplateValueParameterDefault <- "=" AssignExpression / "=" SpecialKeyword
+TemplateAliasParameter <- "alias" Identifier TemplateAliasParameterSpecialization? TemplateAliasParameterDefault? / "alias" BasicType Declarator TemplateAliasParameterSpecialization? TemplateAliasParameterDefault?
+TemplateAliasParameterSpecialization <- ":" Type / ":" ConditionalExpression
+TemplateAliasParameterDefault <- "=" Type / "=" ConditionalExpression
+TemplateTupleParameter <- Identifier "..."
+TemplateMixinDeclaration <- "mixin" "template" Identifier TemplateParameters Constraint? "{" DeclDefs? "}"
+TemplateMixin <- "mixin" MixinTemplateName TemplateArguments? Identifier? ";"
+MixinTemplateName <- "." QualifiedIdentifierList / QualifiedIdentifierList / Typeof "." QualifiedIdentifierList
+QualifiedIdentifierList <- Identifier / Identifier "." QualifiedIdentifierList / TemplateInstance "." QualifiedIdentifierList
+AttributeSpecifier <- Attribute ":" / Attribute DeclarationBlock
+Attribute <- LinkageAttribute / AlignAttribute / DeprecatedAttribute / ProtectionAttribute / Pragma / "static" / "extern" / "abstract" / "final" / "override" / "synchronized" / "auto" / "scope" / "const" / "immutable" / "inout" / "shared" / "__gshared" / Property / "nothrow" / "pure" / "ref"
+DeclarationBlock <- DeclDef / "{" DeclDefs? "}"
+LinkageAttribute <- "extern" "(" LinkageType ")" / "extern" "(" "C++" "," IdentifierList ")"
+LinkageType <- "C" / "C++" / "D" / "Windows" / "Pascal" / "System"
+AlignAttribute <- "align" / "align" "(" IntegerLiteral ")"
+DeprecatedAttribute <- "deprecated" / "deprecated" "(" StringLiteral ")"
+ProtectionAttribute <- "private" / "package" / "package" "(" IdentifierList ")" / "protected" / "public" / "export"
+Property <- "@" PropertyIdentifier / UserDefinedAttribute
+PropertyIdentifier <- "property" / "safe" / "trusted" / "system" / "disable" / "nogc"
+UserDefinedAttribute <- "@" "(" ArgumentList ")" / "@" Identifier / "@" Identifier "(" ArgumentList? ")" / "@" TemplateInstance / "@" TemplateInstance "(" ArgumentList? ")"
+Pragma <- "pragma" "(" Identifier ")" / "pragma" "(" Identifier "," ArgumentList ")"
+ConditionalDeclaration <- Condition DeclarationBlock / Condition DeclarationBlock "else" DeclarationBlock / Condition ":" DeclDefs? / Condition DeclarationBlock "else" ":" DeclDefs?
+ConditionalStatement <- Condition NoScopeNonEmptyStatement / Condition NoScopeNonEmptyStatement "else" NoScopeNonEmptyStatement
+Condition <- VersionCondition / DebugCondition / StaticIfCondition
+VersionCondition <- "version" "(" IntegerLiteral ")" / "version" "(" Identifier ")" / "version" "(" "unittest" ")" / "version" "(" "assert" ")"
+DebugCondition <- "debug" / "debug" "(" IntegerLiteral ")" / "debug" "(" Identifier ")"
+StaticIfCondition <- "static" "if" "(" AssignExpression ")"
+VersionSpecification <- "version" "=" Identifier ";" / "version" "=" IntegerLiteral ";"
+DebugSpecification <- "debug" "=" Identifier ";" / "debug" "=" IntegerLiteral ";"
+StaticAssert <- "static" "assert" "(" AssignExpression ")" ";" / "static" "assert" "(" AssignExpression "," AssignExpression ")" ";"
+Module <- ModuleDeclaration DeclDefs / DeclDefs
+DeclDefs <- DeclDef / DeclDef DeclDefs
+DeclDef <- AttributeSpecifier / Declaration / Constructor / Destructor / Postblit / Allocator / Deallocator / Invariant / UnitTest / AliasThis / StaticConstructor / StaticDestructor / SharedStaticConstructor / SharedStaticDestructor / ConditionalDeclaration / DebugSpecification / VersionSpecification / StaticAssert / TemplateDeclaration / TemplateMixinDeclaration / TemplateMixin / MixinDeclaration / ";"
+ModuleDeclaration <- "module" ModuleFullyQualifiedName ";"
+ModuleFullyQualifiedName <- ModuleName / Packages "." ModuleName
+ModuleName <- Identifier
+Packages <- PackageName / Packages "." PackageName
+PackageName <- Identifier
+ImportDeclaration <- "import" ImportList ";" / "static import" ImportList ";"
+ImportList <- Import / ImportBindings / Import "," ImportList
+Import <- ModuleFullyQualifiedName / ModuleAliasIdentifier "=" ModuleFullyQualifiedName
+ImportBindings <- Import ":" ImportBindList
+ImportBindList <- ImportBind / ImportBind "," ImportBindList
+ImportBind <- Identifier / Identifier "=" Identifier
+ModuleAliasIdentifier <- Identifier
+MixinDeclaration <- "mixin" "(" AssignExpression ")" ";"
