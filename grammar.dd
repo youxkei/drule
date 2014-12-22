@@ -57,7 +57,7 @@ $(GNAME BasicTypeX):
 
 $(GNAME BasicType2):
     $(D *)
-    $(D [ ])
+    $(D [) $(D ])
     $(D [) $(GLINK AssignExpression) $(D ])
     $(D [) $(GLINK AssignExpression) $(D ..) $(GLINK AssignExpression) $(D ])
     $(D [) $(GLINK Type) $(D ])
@@ -113,43 +113,43 @@ $(GNAME ConditionalExpression):
 
 $(GRAMMAR
 $(GNAME OrOrExpression):
-    $(GLINK AndAndExpression)
     $(I OrOrExpression) $(D ||) $(GLINK AndAndExpression)
+    $(GLINK AndAndExpression)
 )
 
 $(GRAMMAR
 $(GNAME AndAndExpression):
-    $(GLINK OrExpression)
     $(I AndAndExpression) $(D &&) $(GLINK OrExpression)
-    $(GLINK CmpExpression)
     $(I AndAndExpression) $(D &&) $(GLINK CmpExpression)
+    $(GLINK OrExpression)
+    $(GLINK CmpExpression)
 )
 
 $(GRAMMAR
 $(GNAME OrExpression):
-    $(GLINK XorExpression)
     $(I OrExpression) $(D |) $(GLINK XorExpression)
+    $(GLINK XorExpression)
 )
 
 $(GRAMMAR
 $(GNAME XorExpression):
-    $(GLINK AndExpression)
     $(I XorExpression) $(D ^) $(GLINK AndExpression)
+    $(GLINK AndExpression)
 )
 
 $(GRAMMAR
 $(GNAME AndExpression):
-    $(GLINK ShiftExpression)
     $(I AndExpression) $(D &) $(GLINK ShiftExpression)
+    $(GLINK ShiftExpression)
 )
 
 $(GRAMMAR
 $(GNAME CmpExpression):
-    $(GLINK ShiftExpression)
     $(GLINK EqualExpression)
     $(GLINK IdentityExpression)
     $(GLINK RelExpression)
     $(GLINK InExpression)
+    $(GLINK ShiftExpression)
 )
 
 $(GRAMMAR
@@ -188,26 +188,26 @@ $(GNAME InExpression):
 
 $(GRAMMAR
 $(GNAME ShiftExpression):
-    $(GLINK AddExpression)
     $(I ShiftExpression) $(D <<) $(GLINK AddExpression)
     $(I ShiftExpression) $(D >>) $(GLINK AddExpression)
     $(I ShiftExpression) $(D >>>) $(GLINK AddExpression)
+    $(GLINK AddExpression)
 )
 
 $(GRAMMAR
 $(GNAME AddExpression):
-    $(GLINK MulExpression)
     $(I AddExpression) $(D +) $(GLINK MulExpression)
     $(I AddExpression) $(D -) $(GLINK MulExpression)
     $(GLINK AddExpression) $(D ~) $(GLINK MulExpression)
+    $(GLINK MulExpression)
 )
 
 $(GRAMMAR
 $(GNAME MulExpression):
-    $(GLINK UnaryExpression)
     $(I MulExpression) $(D *) $(GLINK UnaryExpression)
     $(I MulExpression) $(D /) $(GLINK UnaryExpression)
     $(I MulExpression) $(D %) $(GLINK UnaryExpression)
+    $(GLINK UnaryExpression)
 )
 
 $(GRAMMAR
@@ -278,17 +278,17 @@ $(GNAME PowExpression):
 
 $(GRAMMAR
 $(GNAME PostfixExpression):
-    $(GLINK PrimaryExpression)
     $(I PostfixExpression) $(D .) $(GLINK Identifier)
     $(I PostfixExpression) $(D .) $(GLINK TemplateInstance)
     $(I PostfixExpression) $(D .) $(GLINK NewExpression)
     $(I PostfixExpression) $(D ++)
     $(I PostfixExpression) $(D --)
     $(I PostfixExpression) $(D $(LPAREN)) $(GLINK ArgumentList)$(OPT) $(D $(RPAREN))
-    $(GLINK TypeCtors)$(OPT) $(GLINK BasicType) $(D $(LPAREN)) $(GLINK ArgumentList)$(OPT) $(D $(RPAREN))
     $(GLINK PostfixExpression) $(D [) $(GLINK ArgumentList) $(D ])
     $(GLINK PostfixExpression) $(D [) $(D ])
     $(GLINK PostfixExpression) $(D [) $(GLINK AssignExpression) $(D ..) $(GLINK AssignExpression) $(D ])
+    $(GLINK PrimaryExpression)
+    $(GLINK TypeCtors)$(OPT) $(GLINK BasicType) $(D $(LPAREN)) $(GLINK ArgumentList)$(OPT) $(D $(RPAREN))
 )
 
 
