@@ -167,7 +167,7 @@ $(GNAME IdentityExpression):
 $(GRAMMAR
 $(GNAME RelExpression):
     $(GLINK ShiftExpression) $(D <) $(GLINK ShiftExpression)
-    $(GLINK ShiftExpression) $(D <)$(D =) $(GLINK ShiftExpression)
+    $(GLINK ShiftExpression) $(D <=) $(GLINK ShiftExpression)
     $(GLINK ShiftExpression) $(D >) $(GLINK ShiftExpression)
     $(GLINK ShiftExpression) $(D >=) $(GLINK ShiftExpression)
     $(GLINK ShiftExpression) $(D !<>=) $(GLINK ShiftExpression)
@@ -189,9 +189,9 @@ $(GNAME InExpression):
 $(GRAMMAR
 $(GNAME ShiftExpression):
     $(GLINK AddExpression)
-    $(I ShiftExpression) $(D <)$(D <) $(GLINK AddExpression)
-    $(I ShiftExpression) $(D >)$(D >) $(GLINK AddExpression)
-    $(I ShiftExpression) $(D >)$(D >)$(D >) $(GLINK AddExpression)
+    $(I ShiftExpression) $(D <<) $(GLINK AddExpression)
+    $(I ShiftExpression) $(D >>) $(GLINK AddExpression)
+    $(I ShiftExpression) $(D >>>) $(GLINK AddExpression)
 )
 
 $(GRAMMAR
@@ -199,11 +199,6 @@ $(GNAME AddExpression):
     $(GLINK MulExpression)
     $(I AddExpression) $(D +) $(GLINK MulExpression)
     $(I AddExpression) $(D -) $(GLINK MulExpression)
-    $(GLINK CatExpression)
-)
-
-$(GRAMMAR
-$(GNAME CatExpression):
     $(GLINK AddExpression) $(D ~) $(GLINK MulExpression)
 )
 
@@ -291,20 +286,12 @@ $(GNAME PostfixExpression):
     $(I PostfixExpression) $(D --)
     $(I PostfixExpression) $(D $(LPAREN)) $(GLINK ArgumentList)$(OPT) $(D $(RPAREN))
     $(GLINK TypeCtors)$(OPT) $(GLINK BasicType) $(D $(LPAREN)) $(GLINK ArgumentList)$(OPT) $(D $(RPAREN))
-    $(GLINK IndexExpression)
-    $(GLINK SliceExpression)
-)
-
-$(GRAMMAR
-$(GNAME IndexExpression):
     $(GLINK PostfixExpression) $(D [) $(GLINK ArgumentList) $(D ])
-)
-
-$(GRAMMAR
-$(GNAME SliceExpression):
-    $(GLINK PostfixExpression) $(D [ ])
+    $(GLINK PostfixExpression) $(D [) $(D ])
     $(GLINK PostfixExpression) $(D [) $(GLINK AssignExpression) $(D ..) $(GLINK AssignExpression) $(D ])
 )
+
+
 
 $(GRAMMAR
 $(GNAME PrimaryExpression):
@@ -583,7 +570,7 @@ $(GNAME LabeledStatement):
 
 $(GRAMMAR
 $(GNAME BlockStatement):
-    $(D { })
+    $(D {) $(D })
     $(D {) $(GLINK StatementList) $(D })
 
 $(GNAME StatementList):
@@ -683,7 +670,7 @@ $(GNAME CaseStatement):
     $(D case) $(GLINK ArgumentList) $(D :) $(GLINK ScopeStatementList)
 
 $(GNAME CaseRangeStatement):
-    $(D case) $(GLINK FirstExp) $(D : .. case) $(GLINK LastExp) $(D :) $(GLINK ScopeStatementList)
+    $(D case) $(GLINK FirstExp) $(D :) $(D ..) $(D case) $(GLINK LastExp) $(D :) $(GLINK ScopeStatementList)
 
 $(GNAME FirstExp):
     $(GLINK AssignExpression)
@@ -1179,7 +1166,7 @@ $(GNAME Interface):
 
 $(GRAMMAR
 $(GNAME AliasThis):
-    $(D alias) $(I Identifier) $(D this ;)
+    $(D alias) $(I Identifier) $(D this) $(D ;)
 )
 
 $(H3 $(LNAME2 enum, Enum))
