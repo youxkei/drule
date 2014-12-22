@@ -3,26 +3,26 @@ TypeCtors <- TypeCtor / TypeCtor TypeCtors
 TypeCtor <- "const" / "immutable" / "inout" / "shared"
 BasicType <- BasicTypeX / "." IdentifierList / IdentifierList / Typeof / Typeof "." IdentifierList / TypeCtor "(" Type ")"
 BasicTypeX <- "bool" / "byte" / "ubyte" / "short" / "ushort" / "int" / "uint" / "long" / "ulong" / "char" / "wchar" / "dchar" / "float" / "double" / "real" / "ifloat" / "idouble" / "ireal" / "cfloat" / "cdouble" / "creal" / "void"
-BasicType2 <- "*" / "[ ]" / "[" AssignExpression "]" / "[" AssignExpression ".." AssignExpression "]" / "[" Type "]" / "delegate" Parameters MemberFunctionAttributes? / "function" Parameters FunctionAttributes?
+BasicType2 <- "*" / "[" "]" / "[" AssignExpression "]" / "[" AssignExpression ".." AssignExpression "]" / "[" Type "]" / "delegate" Parameters MemberFunctionAttributes? / "function" Parameters FunctionAttributes?
 IdentifierList <- Identifier / Identifier "." IdentifierList / TemplateInstance / TemplateInstance "." IdentifierList
 Typeof <- "typeof" "(" Expression ")" / "typeof" "(" "return" ")"
 Expression <- CommaExpression
 CommaExpression <- AssignExpression / AssignExpression "," CommaExpression
 AssignExpression <- ConditionalExpression / ConditionalExpression "=" AssignExpression / ConditionalExpression "+=" AssignExpression / ConditionalExpression "-=" AssignExpression / ConditionalExpression "*=" AssignExpression / ConditionalExpression "/=" AssignExpression / ConditionalExpression "%=" AssignExpression / ConditionalExpression "&=" AssignExpression / ConditionalExpression "|=" AssignExpression / ConditionalExpression "^=" AssignExpression / ConditionalExpression "~=" AssignExpression / ConditionalExpression "<" "<" "=" AssignExpression / ConditionalExpression ">>=" AssignExpression / ConditionalExpression ">>>=" AssignExpression / ConditionalExpression "^^=" AssignExpression
 ConditionalExpression <- OrOrExpression / OrOrExpression "?" Expression ":" ConditionalExpression
-OrOrExpression <- AndAndExpression / OrOrExpression "||" AndAndExpression
-AndAndExpression <- OrExpression / AndAndExpression "&&" OrExpression / CmpExpression / AndAndExpression "&&" CmpExpression
-OrExpression <- XorExpression / OrExpression "|" XorExpression
-XorExpression <- AndExpression / XorExpression "^" AndExpression
-AndExpression <- ShiftExpression / AndExpression "&" ShiftExpression
-CmpExpression <- ShiftExpression / EqualExpression / IdentityExpression / RelExpression / InExpression
+OrOrExpression <- OrOrExpression "||" AndAndExpression / AndAndExpression
+AndAndExpression <- AndAndExpression "&&" OrExpression / AndAndExpression "&&" CmpExpression / OrExpression / CmpExpression
+OrExpression <- OrExpression "|" XorExpression / XorExpression
+XorExpression <- XorExpression "^" AndExpression / AndExpression
+AndExpression <- AndExpression "&" ShiftExpression / ShiftExpression
+CmpExpression <- EqualExpression / IdentityExpression / RelExpression / InExpression / ShiftExpression
 EqualExpression <- ShiftExpression "==" ShiftExpression / ShiftExpression "!=" ShiftExpression
 IdentityExpression <- ShiftExpression "is" ShiftExpression / ShiftExpression "!is" ShiftExpression
 RelExpression <- ShiftExpression "<" ShiftExpression / ShiftExpression "<=" ShiftExpression / ShiftExpression ">" ShiftExpression / ShiftExpression ">=" ShiftExpression / ShiftExpression "!<>=" ShiftExpression / ShiftExpression "!<>" ShiftExpression / ShiftExpression "<>" ShiftExpression / ShiftExpression "<>=" ShiftExpression / ShiftExpression "!>" ShiftExpression / ShiftExpression "!>=" ShiftExpression / ShiftExpression "!<" ShiftExpression / ShiftExpression "!<=" ShiftExpression
 InExpression <- ShiftExpression "in" ShiftExpression / ShiftExpression "!in" ShiftExpression
-ShiftExpression <- AddExpression / ShiftExpression "<<" AddExpression / ShiftExpression ">>" AddExpression / ShiftExpression ">>>" AddExpression
-AddExpression <- MulExpression / AddExpression "+" MulExpression / AddExpression "-" MulExpression / AddExpression "~" MulExpression
-MulExpression <- UnaryExpression / MulExpression "*" UnaryExpression / MulExpression "/" UnaryExpression / MulExpression "%" UnaryExpression
+ShiftExpression <- ShiftExpression "<<" AddExpression / ShiftExpression ">>" AddExpression / ShiftExpression ">>>" AddExpression / AddExpression
+AddExpression <- AddExpression "+" MulExpression / AddExpression "-" MulExpression / AddExpression "~" MulExpression / MulExpression
+MulExpression <- MulExpression "*" UnaryExpression / MulExpression "/" UnaryExpression / MulExpression "%" UnaryExpression / UnaryExpression
 UnaryExpression <- "&" UnaryExpression / "++" UnaryExpression / "--" UnaryExpression / "*" UnaryExpression / "-" UnaryExpression / "+" UnaryExpression / "!" UnaryExpression / ComplementExpression / "(" Type ")" "." Identifier / "(" Type ")" "." TemplateInstance / DeleteExpression / CastExpression / PowExpression
 ComplementExpression <- "~" UnaryExpression
 NewExpression <- "new" AllocatorArguments? Type / NewExpressionWithArgs
@@ -34,7 +34,7 @@ ClassArguments <- "(" ArgumentList? ")"
 DeleteExpression <- "delete" UnaryExpression
 CastExpression <- "cast" "(" Type ")" UnaryExpression / "cast" "(" TypeCtors? ")" UnaryExpression
 PowExpression <- PostfixExpression / PostfixExpression "^^" UnaryExpression
-PostfixExpression <- PrimaryExpression / PostfixExpression "." Identifier / PostfixExpression "." TemplateInstance / PostfixExpression "." NewExpression / PostfixExpression "++" / PostfixExpression "--" / PostfixExpression "(" ArgumentList? ")" / TypeCtors? BasicType "(" ArgumentList? ")" / PostfixExpression "[" ArgumentList "]" / PostfixExpression "[" "]" / PostfixExpression "[" AssignExpression ".." AssignExpression "]"
+PostfixExpression <- PostfixExpression "." Identifier / PostfixExpression "." TemplateInstance / PostfixExpression "." NewExpression / PostfixExpression "++" / PostfixExpression "--" / PostfixExpression "(" ArgumentList? ")" / PostfixExpression "[" ArgumentList "]" / PostfixExpression "[" "]" / PostfixExpression "[" AssignExpression ".." AssignExpression "]" / PrimaryExpression / TypeCtors? BasicType "(" ArgumentList? ")"
 PrimaryExpression <- Identifier / "." Identifier / TemplateInstance / "." TemplateInstance / "this" / "super" / "null" / "true" / "false" / "$" / IntegerLiteral / FloatLiteral / CharacterLiteral / StringLiterals / ArrayLiteral / AssocArrayLiteral / FunctionLiteral / AssertExpression / MixinExpression / ImportExpression / NewExpressionWithArgs / BasicTypeX "." Identifier / Typeof / TypeidExpression / IsExpression / "(" Expression ")" / TraitsExpression / SpecialKeyword
 StringLiterals <- StringLiteral / StringLiterals StringLiteral
 ArrayLiteral <- "[" ArgumentList? "]"
