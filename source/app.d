@@ -24,7 +24,7 @@ struct Rule
     {
         string toString()
         {
-            return lhs ~ " <- " ~ rhss.map!(rhs => rhs.toString())().joiner(" / ").array().to!string();
+            return lhs ~ " <- " ~ rhss.map!(rhs => rhs.toString())().joiner(" / ").array().to!string() ~ ";";
         }
     }
     else
