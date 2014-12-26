@@ -540,7 +540,6 @@ $(GNAME NonEmptyStatementNoCaseNoDefault):
     $(GLINK TryStatement)
     $(GLINK ScopeGuardStatement)
     $(GLINK ThrowStatement)
-    $(GLINK AsmStatement)
     $(GLINK PragmaStatement)
     $(GLINK MixinStatement)
     $(GLINK ForeachRangeStatement)
@@ -984,7 +983,7 @@ $(GNAME Parameter):
 
 $(GNAME InOut):
     $(I InOutX)
-    $(I InOut InOutX)
+    $(I InOut) $(I InOutX)
 
 $(GNAME InOutX):
     $(D auto)
@@ -1535,17 +1534,10 @@ $(GNAME ModuleDeclaration):
     $(D module) $(I ModuleFullyQualifiedName) $(D ;)
 
 $(GNAME ModuleFullyQualifiedName):
+    $(I ModuleFullyQualifiedName) $(D .) $(I ModuleName)
     $(I ModuleName)
-    $(I Packages) $(D .) $(I ModuleName)
 
 $(GNAME ModuleName):
-    $(I Identifier)
-
-$(GNAME Packages):
-    $(I PackageName)
-    $(I Packages) $(D .) $(I PackageName)
-
-$(GNAME PackageName):
     $(I Identifier)
 )
 
